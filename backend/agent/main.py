@@ -9,18 +9,19 @@ Run:  uvicorn agent.main:app --reload
 """
 from __future__ import annotations
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from .catch import catch
 from .loop import run_loop
-from ..memory.client import get_bank_id, recall
+from memory.client import get_bank_id, recall
 
 app = FastAPI(title="Anchor - Caregiver Memory Agent", version="0.1.0")
 
 
 class ChatRequest(BaseModel):
-    message: str = Field(..., description="Caregiver message")
+    message: str = Field(..., min_length=1, max_length=2000,
+                         description="Caregiver message")
     bank_id: str | None = None
 
 
@@ -67,10 +68,13 @@ def chat(req: ChatRequest) -> ChatResponse:
 def brief(bank_id: str | None = None) -> BriefResponse:
     """Generate a doctor-visit brief from the family's memory."""
     bank_id = bank_id or get_bank_id()
-    meds = recall(bank_id, "current medications and doses", budget="high")
-    conditions = recall(bank_id, "diagnoses and conditions", budget="high")
-    recent = recall(bank_id, "recent symptoms and observations this week", budget="high")
-    providers = recall(bank_id, "doctors and providers and phone numbers", budget="mid")
+    try:
+        meds = recall(bank_id, "current medications and doses", budget="high")
+        conditions = recall(bank_id, "diagnoses and conditions", budget="high")
+        recent = recall(bank_id, "recent symptoms and observations this week", budget="high")
+        providers = recall(bank_id, "doctors and providers and phone numbers", budget="mid")
+    except Exception as exc:  # noqa: BLE001 - surface a clean 503, not a raw 500
+        raise HTTPException(status_code=503, detail=f"Memory unavailable: {exc}")
 
     lines = ["# Doctor Visit Brief", ""]
     lines.append("## Current Medications")

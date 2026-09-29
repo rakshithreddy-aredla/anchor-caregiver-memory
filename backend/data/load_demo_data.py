@@ -4,7 +4,7 @@ Run:  python -m data.load_demo_data
 """
 from __future__ import annotations
 
-from ..memory.client import get_bank_id, retain_batch
+from memory.client import get_bank_id, retain_batch
 from .synthetic import generate
 
 

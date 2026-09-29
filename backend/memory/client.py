@@ -12,6 +12,7 @@ Hindsight docs: https://hindsight.vectorize.io/
 from __future__ import annotations
 
 import os
+from functools import lru_cache
 
 from dotenv import load_dotenv
 from hindsight_client import Hindsight
@@ -19,8 +20,14 @@ from hindsight_client import Hindsight
 load_dotenv()
 
 
+@lru_cache(maxsize=1)
 def get_client() -> Hindsight:
-    """Return a configured Hindsight client from environment variables."""
+    """Return a cached Hindsight client from environment variables.
+
+    Cached so every retain/recall/reflect reuses one connection pool instead
+    of constructing a new client per call. Tests can reset via
+    ``get_client.cache_clear()``.
+    """
     base_url = os.getenv("HINDSIGHT_BASE_URL", "http://localhost:8888")
     api_key = os.getenv("HINDSIGHT_API_KEY")
     if api_key:
@@ -74,7 +81,8 @@ def recall(bank_id: str, query: str, *, types: list[str] | None = None,
         budget=budget,
         include_chunks=include_chunks,
     )
-    return [r.text for r in response.results]
+    # Some server versions return results=None when nothing matches.
+    return [r.text for r in (response.results or [])]
 
 
 def reflect(bank_id: str, query: str, *, context: str | None = None,

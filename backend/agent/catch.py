@@ -10,20 +10,20 @@ into an actionable, cited risk flag.
 """
 from __future__ import annotations
 
-from ..memory.client import get_bank_id, recall
+from memory.client import get_bank_id, recall
 
 TRIGGERS = {
-    "dizzy": "dizziness",
     "dizzy spells": "dizziness",
+    "short of breath": "breathing",
+    "chest pain": "chest pain",
     "lightheaded": "dizziness",
-    "fall": "fall",
-    "fell": "fall",
     "confusion": "confusion",
     "confused": "confusion",
     "bruising": "bleeding",
     "bleeding": "bleeding",
-    "short of breath": "breathing",
-    "chest pain": "chest pain",
+    "dizzy": "dizziness",
+    "fell": "fall",
+    "fall": "fall",
     "weak": "weakness",
 }
 
@@ -37,17 +37,26 @@ def catch(bank_id: str | None, symptom: str) -> dict:
     bank_id = bank_id or get_bank_id()
     norm = symptom.lower().strip()
 
-    # 1. Recall anything temporal/medication related.
-    meds = recall(bank_id, "current medications and doses", budget="mid")
-    trends = recall(bank_id, f"when did {norm} start and how has it changed", budget="mid")
-
-    # 2. Map the symptom to a risk keyword.
+    # 1. Map the symptom to a risk keyword FIRST - no wasted recall calls
+    #    when the message contains no symptom. Longer phrases are matched
+    #    before shorter ones so "dizzy spells" wins over "dizzy".
     keyword = None
     for phrase, mapped in TRIGGERS.items():
         if phrase in norm:
             keyword = mapped
             break
     if not keyword:
+        return {"risk": False, "reason": None, "evidence": []}
+
+    # 2. Recall anything temporal/medication related. Degrade gracefully if
+    #    the memory layer is unavailable.
+    try:
+        meds = recall(bank_id, "current medications and doses", budget="mid")
+        trends = recall(
+            bank_id, f"when did {keyword} start and how has it changed", budget="mid"
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"[anchor] catch recall unavailable: {exc}")
         return {"risk": False, "reason": None, "evidence": []}
 
     # 3. A simple, transparent heuristic that's easy to demo and verify.

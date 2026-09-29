@@ -6,7 +6,7 @@ Run:  python -m agent.cli
 """
 from __future__ import annotations
 
-from ..memory.client import get_bank_id
+from memory.client import get_bank_id
 from .loop import run_loop
 
 
@@ -23,7 +23,7 @@ def main() -> None:
             continue
         if message.lower() in {"quit", "exit"}:
             break
-        result = run_loop(bank_id, message)
+        result = run_loop(message, bank_id)
         print(f"anchor> {result['answer']}")
         if result["risk"]:
             print(f"  [RISK FLAGGED] {result['risk_reason']}")

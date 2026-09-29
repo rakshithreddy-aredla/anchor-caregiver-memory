@@ -18,6 +18,7 @@ to load into Hindsight via memory.client.retain_batch.
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timedelta
 
 # Family / care-recipient profile (fictional but realistic)
@@ -74,8 +75,12 @@ PROVIDERS = [
 ]
 
 
-def generate(days_back: int = 17, start: datetime | None = None) -> list[dict]:
-    """Generate the full dataset as retain-batch items with ISO timestamps."""
+def generate(start: datetime | None = None) -> list[dict]:
+    """Generate the full dataset as retain-batch items with datetime timestamps.
+
+    Timestamps are datetime objects per Hindsight's documented retain contract
+    (``timestamp=datetime(...)``), so temporal recall works correctly.
+    """
     start = start or datetime(2026, 9, 1, 8, 0, 0)
     items: list[dict] = []
 
@@ -85,19 +90,19 @@ def generate(days_back: int = 17, start: datetime | None = None) -> list[dict]:
                    f"{', '.join(PARENT['diagnoses'])}. Baseline BP "
                    f"{PARENT['baseline_bp']}. {PARENT['daily']}.",
         "context": "profile",
-        "timestamp": start.isoformat(),
+        "timestamp": start,
     })
     for m in MEDS:
         items.append({
             "content": f"{PARENT['name']} takes {m}.",
             "context": "medication baseline",
-            "timestamp": start.isoformat(),
+            "timestamp": start,
         })
     for p in PROVIDERS:
         items.append({
             "content": p,
             "context": "provider contact",
-            "timestamp": start.isoformat(),
+            "timestamp": start,
         })
 
     # The narrative arc.
@@ -106,17 +111,30 @@ def generate(days_back: int = 17, start: datetime | None = None) -> list[dict]:
         items.append({
             "content": f"{PARENT['name']}, day +{offset}: {content}",
             "context": context,
-            "timestamp": ts.isoformat(),
+            "timestamp": ts,
         })
     return items
 
 
-def to_jsonl(path: str = "data/demo_data.jsonl") -> None:
-    """Write the dataset to JSONL so it can be versioned / inspected."""
+# Written next to this module so the default path works regardless of cwd.
+DEFAULT_JSONL_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "demo_data.jsonl"
+)
+
+
+def to_jsonl(path: str | None = None) -> None:
+    """Write the dataset to JSONL (timestamps serialized as ISO strings)."""
+    path = path or DEFAULT_JSONL_PATH
+    parent = os.path.dirname(os.path.abspath(path))
+    os.makedirs(parent, exist_ok=True)
     items = generate()
     with open(path, "w", encoding="utf-8") as fh:
         for it in items:
-            fh.write(json.dumps(it, ensure_ascii=False) + "\n")
+            row = dict(it)
+            ts = row.get("timestamp")
+            if isinstance(ts, datetime):
+                row["timestamp"] = ts.isoformat()
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
     print(f"[anchor] wrote {len(items)} demo memories to {path}")
 
 

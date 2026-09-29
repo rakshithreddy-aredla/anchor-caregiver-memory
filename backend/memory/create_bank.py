@@ -47,6 +47,30 @@ DISPOSITION = {
 }
 
 
+def _add_directives(client, bank_id: str) -> bool:
+    """Persist directives, tolerating client API differences between versions.
+
+    Returns True only if every directive was added.
+    """
+    if not hasattr(client, "directives"):
+        return False
+    added = 0
+    for directive in DIRECTIVES:
+        try:
+            client.directives.add(bank_id=bank_id, directive=directive)
+            added += 1
+        except TypeError:
+            # Some client versions name the kwarg `text` instead.
+            try:
+                client.directives.add(bank_id=bank_id, text=directive)
+                added += 1
+            except Exception as exc:  # noqa: BLE001
+                print(f"[anchor] directive skipped ({exc})")
+        except Exception as exc:  # noqa: BLE001
+            print(f"[anchor] directive skipped ({exc})")
+    return added == len(DIRECTIVES)
+
+
 def create_bank(bank_id: str | None = None) -> None:
     """Create/update the Anchor memory bank with mission, directives, disposition."""
     bank_id = bank_id or get_bank_id()
@@ -57,13 +81,9 @@ def create_bank(bank_id: str | None = None) -> None:
         mission=MISSION,
         disposition=DISPOSITION,
     )
-    # Add directives one at a time (helper API differs by version; the raw
-    # directives namespace is also available via client.directives).
-    for directive in DIRECTIVES:
+    if not _add_directives(client, bank_id):
+        # Fallback: some client versions accept directives on create_bank.
         try:
-            client.directives.add(bank_id=bank_id, directive=directive)
-        except AttributeError:
-            # Fallback: create bank with directives if the client supports it.
             client.create_bank(
                 bank_id=bank_id,
                 name="Anchor - Caregiver Medical Memory",
@@ -71,7 +91,9 @@ def create_bank(bank_id: str | None = None) -> None:
                 directives=DIRECTIVES,
                 disposition=DISPOSITION,
             )
-            break
+        except TypeError as exc:
+            print(f"[anchor] warning: directives not persisted ({exc}); "
+                  "add them via the Hindsight control plane.")
     print(f"[anchor] bank '{bank_id}' configured.")
 
 

@@ -20,7 +20,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from ..memory.client import get_bank_id, reflect, retain
+from memory.client import get_bank_id, reflect, retain
 
 load_dotenv()
 
@@ -49,8 +49,7 @@ def run_loop(user_message: str, bank_id: str | None = None,
     """Handle one caregiver message and return an answer + risk summary.
 
     Returns:
-        {"answer": str, "risk": bool, "risk_reason": str | None,
-         "sources": [...]}
+        {"answer": str, "risk": bool, "risk_reason": str | None}
     """
     bank_id = bank_id or get_bank_id()
 
@@ -65,7 +64,7 @@ def run_loop(user_message: str, bank_id: str | None = None,
 
     # 3. Compose the final answer.
     try:
-        final = _compose_answer(user_message, grounded, risk_reason)
+        final = _compose_answer(grounded, risk_reason)
     except Exception:  # noqa: BLE001
         final = grounded
 
@@ -129,8 +128,11 @@ def _detect_risk(bank_id: str, user_message: str, grounded: str) -> str | None:
             tools=tools,
             tool_choice={"type": "function", "function": {"name": "report_risk"}},
         )
-        tool_call = resp.choices[0].message.tool_calls[0]
-        args = json.loads(tool_call.function.arguments)
+        tool_calls = resp.choices[0].message.tool_calls
+        if not tool_calls:
+            # Model ignored tool_choice; treat as "no risk" rather than crash.
+            return None
+        args = json.loads(tool_calls[0].function.arguments)
         if args.get("risk"):
             return args.get("reason")
         return None
@@ -139,7 +141,7 @@ def _detect_risk(bank_id: str, user_message: str, grounded: str) -> str | None:
         return None
 
 
-def _compose_answer(user_message: str, grounded: str, risk_reason: str | None) -> str:
+def _compose_answer(grounded: str, risk_reason: str | None) -> str:
     """Final, warm reply. Falls back to the grounded text on LLM failure."""
     risk_line = (
         f"\n\nI want to flag something important: {risk_reason}. "

@@ -7,13 +7,9 @@ Run:  streamlit run frontend/app.py
 from __future__ import annotations
 
 import os
-import sys
 
 import requests
 import streamlit as st
-
-# Allow running from the repo root while importing backend modules.
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
 API_URL = os.getenv("ANCHOR_API_URL", "http://localhost:8000")
 

@@ -82,25 +82,35 @@ HINDSIGHT_API_KEY=your-key-here
 GROQ_API_KEY=your-groq-key
 ```
 
-### 4. Create the memory bank
+### 4. Create the memory bank + load demo data
+
+From the `backend/` directory:
 
 ```bash
+cd backend
 python -m memory.create_bank
-```
-
-### 5. Load the synthetic dataset (for the demo)
-
-```bash
 python -m data.load_demo_data
 ```
 
-### 6. Run the agent
+(Or from the repo root: `python run.py` does both.)
+
+### 5. Run the backend
+
+From the `backend/` directory:
 
 ```bash
-python -m agent.main
+uvicorn agent.main:app --reload
 ```
 
-Then open the chat UI and ask:
+### 6. Open the chat UI
+
+From the repo root:
+
+```bash
+streamlit run frontend/app.py
+```
+
+Then ask:
 
 > "Mom is dizzy, should I be worried?"
 

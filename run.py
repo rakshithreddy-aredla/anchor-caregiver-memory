@@ -5,9 +5,10 @@ learning-curve so you can verify the demo before recording.
 
 Run:  python run.py
 """
+import os
 import sys
 
-sys.path.insert(0, "backend")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend"))
 
 from memory.create_bank import create_bank
 from data.load_demo_data import load
@@ -19,9 +20,9 @@ def main() -> None:
     count = load()
     print(f"Loaded {count} demo memories. Bank ready.")
     print("Next steps:")
-    print("  1. Start backend:  uvicorn agent.main:app --reload")
-    print("  2. Start UI:       streamlit run frontend/app.py")
-    print("  Or talk directly:  python -m agent.cli")
+    print("  1. Start backend:  uvicorn agent.main:app --reload  (from the backend/ dir)")
+    print("  2. Start UI:       streamlit run frontend/app.py    (from the repo root)")
+    print("  Or talk directly:  python -m agent.cli              (from the backend/ dir)")
 
 
 if __name__ == "__main__":
