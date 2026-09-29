@@ -1,0 +1,24 @@
+{"content": "Margaret Chen, age 78, diagnoses: atrial fibrillation, hypertension, mild osteoarthritis. Baseline BP 130/80. walks 20 minutes, sleeps 7 hours.", "context": "profile", "timestamp": "2026-09-01T08:00:00"}
+{"content": "Margaret Chen takes Warfarin 5mg once daily (blood thinner).", "context": "medication baseline", "timestamp": "2026-09-01T08:00:00"}
+{"content": "Margaret Chen takes Lisinopril 10mg daily (BP).", "context": "medication baseline", "timestamp": "2026-09-01T08:00:00"}
+{"content": "Margaret Chen takes Atorvastatin 20mg nightly (cholesterol).", "context": "medication baseline", "timestamp": "2026-09-01T08:00:00"}
+{"content": "Dr. Anita Patel, Cardiologist - (555) 010-2233", "context": "provider contact", "timestamp": "2026-09-01T08:00:00"}
+{"content": "Dr. James Okafor, Primary Care - (555) 010-8899", "context": "provider contact", "timestamp": "2026-09-01T08:00:00"}
+{"content": "Margaret Chen, day +0: Margaret started her day, BP 128/78, felt well. Walked 20 minutes.", "context": "daily observation", "timestamp": "2026-09-01T08:00:00"}
+{"content": "Margaret Chen, day +1: BP 131/82 at breakfast. No complaints.", "context": "daily observation", "timestamp": "2026-09-02T08:00:00"}
+{"content": "Margaret Chen, day +2: BP 129/80. Took Warfarin 5mg at 8am as usual.", "context": "medication", "timestamp": "2026-09-03T08:00:00"}
+{"content": "Margaret Chen, day +3: Slight joint stiffness in the morning, eased after walking.", "context": "daily observation", "timestamp": "2026-09-04T08:00:00"}
+{"content": "Margaret Chen, day +4: BP 132/84. Appetite normal.", "context": "daily observation", "timestamp": "2026-09-05T08:00:00"}
+{"content": "Margaret Chen, day +5: Visited Dr. Patel, her cardiologist. Routine check, no changes.", "context": "doctor visit", "timestamp": "2026-09-06T08:00:00"}
+{"content": "Margaret Chen, day +6: BP 130/81. Felt energetic, went for a longer walk.", "context": "daily observation", "timestamp": "2026-09-07T08:00:00"}
+{"content": "Margaret Chen, day +7: BP 127/78. No new symptoms.", "context": "daily observation", "timestamp": "2026-09-08T08:00:00"}
+{"content": "Margaret Chen, day +8: BP 131/83. Complained of mild morning stiffness only.", "context": "daily observation", "timestamp": "2026-09-09T08:00:00"}
+{"content": "Margaret Chen, day +9: BP 130/82. Normal day, took all meds on time.", "context": "medication", "timestamp": "2026-09-10T08:00:00"}
+{"content": "Margaret Chen, day +10: BP 128/79. Feeling well.", "context": "daily observation", "timestamp": "2026-09-11T08:00:00"}
+{"content": "Margaret Chen, day +11: BP 133/85 - slightly higher than baseline. Noted.", "context": "daily observation", "timestamp": "2026-09-12T08:00:00"}
+{"content": "Margaret Chen, day +12: Saw Dr. Patel. Blood pressure trending up; started Metoprolol 25mg once daily for hypertension. Added to existing meds.", "context": "doctor visit / medication change", "timestamp": "2026-09-13T08:00:00"}
+{"content": "Margaret Chen, day +13: BP 138/88 after starting Metoprolol. Slight fatigue.", "context": "daily observation", "timestamp": "2026-09-14T08:00:00"}
+{"content": "Margaret Chen, day +14: Dr. Patel doubled Metoprolol to 50mg daily because BP was still elevated. Warfarin unchanged.", "context": "medication change", "timestamp": "2026-09-15T08:00:00"}
+{"content": "Margaret Chen, day +15: BP 152/90 this morning - noticeably higher. Margaret felt dizzy after standing up.", "context": "symptom", "timestamp": "2026-09-16T08:00:00"}
+{"content": "Margaret Chen, day +16: BP 158/92. Reported lightheadedness twice today.", "context": "symptom", "timestamp": "2026-09-17T08:00:00"}
+{"content": "Margaret Chen, day +17: BP 165/92 - highest reading. Dizzy spells continue, especially after standing. Taking Metoprolol 50mg + Warfarin 5mg.", "context": "symptom / medication", "timestamp": "2026-09-18T08:00:00"}
